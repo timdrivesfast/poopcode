@@ -1,6 +1,0 @@
-ON CONFLICT (slug) DO UPDATE 
-SET description = EXCLUDED.description,
-    difficulty = EXCLUDED.difficulty, 
-    category = EXCLUDED.category,
-    is_premium = EXCLUDED.is_premium,
-    updated_at = now(); 
