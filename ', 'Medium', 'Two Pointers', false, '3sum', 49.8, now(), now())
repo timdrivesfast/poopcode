@@ -1,0 +1,17 @@
+INSERT INTO public.problems (id, title, description, difficulty, category, is_premium, slug, acceptance_rate, created_at, updated_at)
+VALUES
+(gen_random_uuid(), '3Sum', 'Given an integer array nums, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.
+
+Notice that the solution set must not contain duplicate triplets.
+
+**Example:**
+```
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+```', 'Medium', 'Two Pointers', false, '3sum', 49.8, now(), now())
+ON CONFLICT (slug) DO UPDATE 
+SET description = EXCLUDED.description,
+    difficulty = EXCLUDED.difficulty, 
+    category = EXCLUDED.category,
+    is_premium = EXCLUDED.is_premium,
+    updated_at = now(); 

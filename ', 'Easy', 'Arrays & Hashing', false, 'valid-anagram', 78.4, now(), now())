@@ -1,0 +1,24 @@
+-- Valid Anagram
+INSERT INTO public.problems (id, title, description, difficulty, category, is_premium, slug, acceptance_rate, created_at, updated_at)
+VALUES
+(gen_random_uuid(), 'Valid Anagram', 'Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.
+
+An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+**Example 1:**
+```
+Input: s = "anagram", t = "nagaram"
+Output: true
+```
+
+**Example 2:**
+```
+Input: s = "rat", t = "car"
+Output: false
+```', 'Easy', 'Arrays & Hashing', false, 'valid-anagram', 78.4, now(), now())
+ON CONFLICT (slug) DO UPDATE 
+SET description = EXCLUDED.description,
+    difficulty = EXCLUDED.difficulty, 
+    category = EXCLUDED.category,
+    is_premium = EXCLUDED.is_premium,
+    updated_at = now(); 

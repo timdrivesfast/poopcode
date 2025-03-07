@@ -1,0 +1,22 @@
+INSERT INTO public.problems (id, title, description, difficulty, category, is_premium, slug, acceptance_rate, created_at, updated_at)
+VALUES
+(gen_random_uuid(), 'Contains Duplicate', 'Given an integer array `nums`, return `true` if any value appears at least twice in the array, and return `false` if every element is distinct.
+
+**Example 1:**
+```
+Input: nums = [1,2,3,1]
+Output: true
+```
+
+**Example 2:**
+```
+Input: nums = [1,2,3,4]
+Output: false
+```', 'Easy', 'Arrays & Hashing', false, 'contains-duplicate', 80.5, now(), now())
+
+ON CONFLICT (slug) DO UPDATE 
+SET description = EXCLUDED.description,
+    difficulty = EXCLUDED.difficulty, 
+    category = EXCLUDED.category,
+    is_premium = EXCLUDED.is_premium,
+    updated_at = now(); 
