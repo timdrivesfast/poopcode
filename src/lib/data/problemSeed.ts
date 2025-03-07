@@ -230,4 +230,35 @@ export const PROBLEM_DATA: Record<string, Problem> = {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   }
-}; 
+};
+
+export const problemData = [
+  {
+    id: 1,
+    slug: "contains-duplicate",
+    title: "Contains Duplicate",
+    category: "Arrays & Hashing",
+    difficulty: "Easy",
+    description: "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.",
+    examples: [
+      {
+        input: "nums = [1,2,3,1]",
+        output: "true",
+        explanation: "1 appears twice in the array."
+      },
+      // ...more examples
+    ],
+    starterCode: {
+      javascript: `/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+function containsDuplicate(nums) {
+    
+}`,
+      // other languages...
+    },
+    isNeetCode150: true,
+  },
+  // ... other problems
+]; 

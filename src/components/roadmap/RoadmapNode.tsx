@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { PROBLEM_DATA } from '@/lib/data/problemSeed';
+import Link from 'next/link';
 
 interface RoadmapNodeProps {
   node: RoadmapNodeWithProgress;
@@ -22,8 +23,8 @@ export default function RoadmapNode({
   onToggle,
   level
 }: RoadmapNodeProps) {
-  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [status, setStatus] = useState<'not_started' | 'in_progress' | 'completed'>(node.status);
   const [isUpdating, setIsUpdating] = useState(false);
   
@@ -101,9 +102,8 @@ export default function RoadmapNode({
     }
   };
   
-  const openUrl = (url) => {
-    window.open(url || `https://leetcode.com/problems/${node.title.toLowerCase().replace(/\s+/g, '-')}/`, '_blank');
-  };
+  // Generate the practice URL based on the node ID
+  const practiceUrl = `/practice/${node.id.toLowerCase().replace(/\s+/g, '-')}`;
   
   return (
     <motion.div 
@@ -208,6 +208,14 @@ export default function RoadmapNode({
             </div>
           </div>
         )}
+      </div>
+      <div className="node-actions mt-2">
+        <Link 
+          href={practiceUrl}
+          className="btn btn-sm btn-primary"
+        >
+          Practice Problems
+        </Link>
       </div>
     </motion.div>
   );

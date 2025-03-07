@@ -1,4 +1,7 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCourseById } from '@/lib/services/courseService';
 import { getLessonsByCourseId } from '@/lib/services/lessonService';
@@ -10,114 +13,148 @@ interface Props {
   };
 }
 
-export default async function CourseDetailPage({ params }: Props) {
-  const { courseId } = params;
+// Mock course data
+const COURSES_DATA = {
+  'algorithms-data-structures': {
+    title: 'Algorithms & Data Structures for Beginners',
+    description: 'Learn the foundations of coding interviews with our step-by-step lessons and interactive exercises.',
+    color: 'bg-purple-700',
+    lessons: [
+      {
+        id: 'arrays-101',
+        title: 'Arrays 101',
+        description: 'Learn the basics of arrays and how they work in memory.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '12:30',
+        slug: 'arrays-101'
+      },
+      {
+        id: 'linked-lists-basics',
+        title: 'Linked Lists Basics',
+        description: 'Understanding the foundation of linked data structures.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '15:45',
+        slug: 'linked-lists-basics'
+      },
+      {
+        id: 'python-for-coding-interviews',
+        title: 'Python for Coding Interviews',
+        description: 'Essential Python concepts for acing technical interviews.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '18:20',
+        slug: 'python-for-coding-interviews'
+      }
+    ]
+  },
+  'advanced-algorithms': {
+    title: 'Advanced Algorithms',
+    description: 'Take your algorithm skills to the next level with complex problems and optimization techniques.',
+    color: 'bg-red-700',
+    lessons: [
+      {
+        id: 'dynamic-programming',
+        title: 'Dynamic Programming Deep Dive',
+        description: 'Master complex DP problems with this comprehensive guide.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '22:15',
+        slug: 'dynamic-programming'
+      },
+      {
+        id: 'graph-algorithms',
+        title: 'Graph Algorithms Masterclass',
+        description: 'From Dijkstra to A*, learn all the essential graph algorithms.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '25:40',
+        slug: 'graph-algorithms'
+      }
+    ]
+  },
+  'system-design': {
+    title: 'System Design for Beginners',
+    description: 'Learn how to design scalable systems for technical interviews.',
+    color: 'bg-blue-700',
+    lessons: [
+      {
+        id: 'system-design-basics',
+        title: 'System Design Fundamentals',
+        description: 'Learn the core concepts behind designing scalable systems.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '20:10',
+        slug: 'system-design-basics'
+      },
+      {
+        id: 'database-design',
+        title: 'Database Design and Scaling',
+        description: 'Choosing the right database and scaling strategies.',
+        videoId: 'dQw4w9WgXcQ',
+        duration: '18:30',
+        slug: 'database-design'
+      }
+    ]
+  }
+};
+
+export default function CoursePage() {
+  const params = useParams();
+  const courseId = params.courseId as string;
+  const [course, setCourse] = useState<any>(null);
   
-  const course = await getCourseById(courseId);
+  useEffect(() => {
+    // In a real app, you would fetch the course data from an API
+    setCourse(COURSES_DATA[courseId]);
+  }, [courseId]);
+  
   if (!course) {
-    notFound();
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-400">Loading course...</p>
+      </div>
+    );
   }
   
-  const lessons = await getLessonsByCourseId(courseId);
-  
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Sidebar with lesson list */}
-      <div className="w-full md:w-64 bg-gray-800 p-4 md:h-[calc(100vh-64px)] md:overflow-y-auto">
-        <div className="mb-4 pb-4 border-b border-gray-700">
-          <h2 className="font-bold text-xl">{course.title}</h2>
-          <p className="text-sm text-gray-400 mt-1">{course.description}</p>
-        </div>
-        
-        <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-2">Lessons</h3>
-          <ul className="space-y-1">
-            {lessons.map((lesson) => (
-              <li key={lesson.id}>
-                <Link 
-                  href={`/courses/${courseId}/lesson/${lesson.id}`}
-                  className={`flex items-center justify-between p-2 rounded hover:bg-gray-700 ${
-                    lesson.is_completed ? 'bg-green-900/20' : ''
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <div className={`w-5 h-5 rounded-full border mr-2 flex items-center justify-center ${
-                      lesson.is_completed ? 'bg-green-500 border-green-500' : 'border-gray-600'
-                    }`}>
-                      {lesson.is_completed && (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="text-sm">{lesson.title}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {lesson.duration && (
-                      <span className="text-xs text-gray-500">{lesson.duration} min</span>
-                    )}
-                    {lesson.is_premium && (
-                      <span className="bg-yellow-900 text-yellow-400 px-2 py-0.5 rounded text-xs">PRO</span>
-                    )}
-                    {!lesson.is_premium && (
-                      <span className="bg-green-900 text-green-400 px-2 py-0.5 rounded text-xs">FREE</span>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      {/* Course Header */}
+      <div className={`${course.color} p-8 rounded-lg mb-8`}>
+        <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
+        <p className="text-xl opacity-80">{course.description}</p>
       </div>
       
-      {/* Main content area - Course overview */}
-      <div className="flex-1 bg-black p-8">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">{course.title}</h1>
-          
-          <div className="flex items-center space-x-4 mb-8">
-            <span className="bg-gray-800 px-3 py-1 rounded text-sm">{course.difficulty}</span>
-            <span className="text-gray-400">{lessons.length} lessons</span>
-            {course.is_premium && (
-              <span className="bg-yellow-600 text-white px-3 py-1 rounded text-sm">Premium Course</span>
-            )}
-          </div>
-          
-          <div className="prose prose-invert max-w-none">
-            <p className="text-lg text-gray-300 mb-6">{course.description}</p>
-            
-            <div className="bg-gray-800 p-6 rounded-lg mb-8">
-              <h2 className="text-xl font-bold mb-4">What You'll Learn</h2>
-              <p className="text-gray-300 mb-6">
-                This course provides a comprehensive introduction to algorithms and data structures.
-                Select a lesson from the sidebar to start learning.
-              </p>
-              
-              {lessons.length > 0 && (
-                <Link 
-                  href={`/courses/${courseId}/lesson/${lessons[0].id}`}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md inline-block"
-                >
-                  Start First Lesson
-                </Link>
-              )}
-            </div>
-            
-            {course.is_premium && (
-              <div className="bg-gradient-to-r from-yellow-900 to-yellow-700 p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-2">Premium Course</h2>
-                <p className="text-gray-200 mb-4">
-                  Upgrade to Pro to access all lessons in this premium course.
-                </p>
-                <Link 
-                  href="/pro"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-md inline-block"
-                >
-                  Upgrade to Pro
-                </Link>
+      {/* Lessons List */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Course Lessons</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {course.lessons.map((lesson: any) => (
+            <Link href={`/courses/lessons/${lesson.slug}`} key={lesson.id}>
+              <div className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-blue-500 transition-colors">
+                {/* Video Thumbnail */}
+                <div className="aspect-video bg-gray-900 relative group">
+                  <img 
+                    src={`https://img.youtube.com/vi/${lesson.videoId}/maxresdefault.jpg`} 
+                    alt={lesson.title}
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-full p-3 opacity-90 group-hover:opacity-100 transition-opacity">
+                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" fillRule="evenodd"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
+                    {lesson.duration}
+                  </div>
+                </div>
+                
+                {/* Lesson Info */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">{lesson.title}</h3>
+                  <p className="text-gray-400 text-sm">{lesson.description}</p>
+                </div>
               </div>
-            )}
-          </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

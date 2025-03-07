@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
+type Error = {
+  message: string;
+};
+
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +31,8 @@ export default function SignIn() {
       
       router.push('/');
       router.refresh();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       setError(error.message || 'An error occurred during sign in');
     } finally {
       setLoading(false);

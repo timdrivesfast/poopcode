@@ -35,6 +35,49 @@ export default async function LessonPage({ params }: Props) {
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
   
+  // Add YouTube video embed function
+  function getYoutubeEmbedForCourse(courseId: string, lessonIndex: number = 0): string {
+    // Map of course IDs to arrays of YouTube video IDs
+    const courseVideos = {
+      'algorithms-for-beginners': [
+        'BBpAmxU_NQo', // Data Structures Easy to Advanced
+        '0IAPZzGSbME', // Data Structures Full Course
+        'RBSGKlAvoiM', // Data Structures & Algorithms #1
+        'zg9ih6SVACc', // Algorithms: Recursion
+      ],
+      'python-cheat-sheet': [
+        '_uQrJ0TkZlc', // Python Tutorial for Beginners
+        'rfscVS0vtbw', // Python Full Course for Beginners
+        'kqtD5dpn9C8', // Python for Beginners - Learn Python in 1 Hour
+        'HGOBQPFzWKo', // Python OOP Tutorial
+      ],
+      'big-o-notation': [
+        'v4cd1O4zkGw', // Big O Notation - Full Course
+        'Mo4vesaut8g', // Introduction to Big O Notation
+        'D6xkbGLQesk', // Big O Explained with Examples
+        'itn8highTRo', // Big O in 5 Minutes
+      ],
+      'data-structures-for-interviews': [
+        'RBSGKlAvoiM', // Data Structures Easy to Advanced Course
+        '41GSinwoMYA', // Coding Interview Prep - Data Structures
+        'sVxBVvlnJsM', // 8 Common Data Structures Every Programmer Must Know
+        'QUUSvQgMO7k', // Data Structures and Algorithms in 15 Minutes
+      ]
+    };
+
+    // Default video if course or lesson not found
+    const defaultVideo = 'XVv6mJpFOb0'; // General coding interview prep
+    
+    // Get videos for course or default to empty array
+    const videos = courseVideos[courseId] || [];
+    
+    // Get specific video or first video or default
+    const videoId = videos[lessonIndex] || videos[0] || defaultVideo;
+    
+    // Return embed URL
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Sidebar */}
@@ -105,23 +148,23 @@ export default async function LessonPage({ params }: Props) {
             )}
           </div>
           
+          {/* Video player using YouTube embed */}
+          <div className="mt-4 mb-8">
+            <h2 className="text-xl font-bold mb-4">Video Tutorial</h2>
+            <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden">
+              <iframe 
+                className="w-full h-full"
+                src={getYoutubeEmbedForCourse(courseId, currentIndex)} 
+                title={lesson.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+          
           {/* Display lesson content */}
           <LessonContent content={lesson.content || ''} />
-          
-          {/* Video player if available */}
-          {lesson.video_url && (
-            <div className="mt-6 mb-8">
-              <h2 className="text-lg font-bold mb-3">Video Tutorial</h2>
-              <div className="aspect-w-16 aspect-h-9 bg-gray-800 rounded-lg overflow-hidden">
-                <iframe 
-                  src={lesson.video_url} 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
-              </div>
-            </div>
-          )}
           
           {/* Lesson navigation */}
           <LessonNavigation 

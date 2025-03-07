@@ -13,20 +13,23 @@ export interface Roadmap {
 
 export interface RoadmapNode {
   id: string;
-  roadmap_id: string;
   title: string;
-  description: string | null;
-  content: string | null;
-  parent_id: string | null;
-  order_index: number;
-  is_premium: boolean;
-  color: string | null;
-  type: 'section' | 'topic' | 'resource' | 'problem' | 'challenge'; 
-  estimated_hours: number | null;
-  related_courses: string[] | null;
-  related_problems: string[] | null;
-  created_at: string;
-  updated_at: string;
+  description?: string;
+  position?: { x: number; y: number };
+  completed?: boolean;
+}
+
+export interface RoadmapEdge {
+  source: string;
+  target: string;
+}
+
+export interface Roadmap {
+  id: string;
+  title: string;
+  description: string;
+  nodes: RoadmapNode[];
+  edges: RoadmapEdge[];
 }
 
 export interface RoadmapNodeWithProgress extends RoadmapNode {
@@ -34,33 +37,122 @@ export interface RoadmapNodeWithProgress extends RoadmapNode {
   children?: RoadmapNodeWithProgress[];
 }
 
-export async function getRoadmaps(): Promise<Roadmap[]> {
-  const { data, error } = await supabase
-    .from('roadmaps')
-    .select('*')
-    .order('order_index');
-
-  if (error) {
-    console.error('Error fetching roadmaps:', error);
-    throw error;
+// Mock data
+const ROADMAPS: Record<string, Roadmap> = {
+  'algorithms': {
+    id: 'algorithms',
+    title: 'Algorithm Roadmap',
+    description: 'Master data structures and algorithms with this structured learning path.',
+    nodes: [
+      { id: 'arrays-hashing', title: 'Arrays & Hashing', position: { x: 400, y: 100 } },
+      { id: 'two-pointers', title: 'Two Pointers', position: { x: 300, y: 200 } },
+      { id: 'stack', title: 'Stack', position: { x: 500, y: 200 } },
+      // Add more nodes as needed
+    ],
+    edges: [
+      { source: 'arrays-hashing', target: 'two-pointers' },
+      { source: 'arrays-hashing', target: 'stack' },
+      // Add more edges as needed
+    ]
+  },
+  'data-structures': {
+    id: 'data-structures',
+    title: 'Data Structures Roadmap',
+    description: 'Learn fundamental data structures used in software engineering',
+    difficulty: 'Beginner',
+    order_index: 1,
+    is_premium: false,
+    created_at: '2023-01-02T00:00:00Z',
+    updated_at: '2023-01-02T00:00:00Z',
+    nodes: [
+      { id: 'arrays', title: 'Arrays', position: { x: 300, y: 100 } },
+      { id: 'linked-lists', title: 'Linked Lists', position: { x: 200, y: 200 } },
+      { id: 'stacks', title: 'Stacks', position: { x: 400, y: 200 } },
+      // More nodes...
+    ],
+    edges: [
+      { source: 'arrays', target: 'linked-lists' },
+      { source: 'arrays', target: 'stacks' },
+      // More edges...
+    ]
   }
+};
 
-  return data;
+/**
+ * Get all available roadmaps
+ */
+export async function getRoadmaps(): Promise<Roadmap[]> {
+  try {
+    // In production this would fetch from an API or database
+    return Object.values(ROADMAPS);
+  } catch (error) {
+    console.error('Error fetching roadmaps:', error);
+    return [];
+  }
 }
 
-export async function getRoadmapById(roadmapId: string): Promise<Roadmap | null> {
-  const { data, error } = await supabase
-    .from('roadmaps')
-    .select('*')
-    .eq('id', roadmapId)
-    .single();
-
-  if (error) {
+/**
+ * Get a specific roadmap by ID
+ */
+export async function getRoadmapById(id: string): Promise<Roadmap | null> {
+  try {
+    // In production this would fetch from an API or database
+    return ROADMAPS[id] || null;
+  } catch (error) {
     console.error('Error fetching roadmap:', error);
     return null;
   }
+}
 
-  return data;
+/**
+ * Save user progress for a roadmap node
+ */
+export async function saveRoadmapProgress(
+  roadmapId: string, 
+  nodeId: string, 
+  completed: boolean
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // In production this would save to an API or database
+    // For now, save to localStorage
+    if (typeof window !== 'undefined') {
+      const key = `roadmap_progress_${roadmapId}`;
+      const savedProgress = localStorage.getItem(key) || '{}';
+      const progress = JSON.parse(savedProgress);
+      
+      progress[nodeId] = completed;
+      localStorage.setItem(key, JSON.stringify(progress));
+    }
+    
+    return { success: true };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+
+/**
+ * Get user progress for a roadmap
+ */
+export async function getRoadmapProgress(
+  roadmapId: string
+): Promise<{ [nodeId: string]: boolean } | null> {
+  try {
+    // In production this would fetch from an API or database
+    // For now, get from localStorage
+    if (typeof window !== 'undefined') {
+      const key = `roadmap_progress_${roadmapId}`;
+      const savedProgress = localStorage.getItem(key) || '{}';
+      return JSON.parse(savedProgress);
+    }
+    
+    return {};
+  } catch (error) {
+    console.error('Error loading roadmap progress:', error);
+    return null;
+  }
 }
 
 export async function getRoadmapNodes(roadmapId: string): Promise<RoadmapNodeWithProgress[]> {

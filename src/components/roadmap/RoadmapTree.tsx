@@ -1,19 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 
 interface RoadmapTreeProps {
-  nodes: any[];
-  roadmapId: string;
+  roadmap: Roadmap;
 }
 
-export default function RoadmapTree({ nodes, roadmapId }: RoadmapTreeProps) {
+export default function RoadmapTree({ roadmap }: RoadmapTreeProps) {
   // Simplified version of the node tree
+  useEffect(() => {
+    // Your existing code
+  }, [roadmap.nodes]); // Add nodes to the dependency array
+
   return (
     <div className="relative">
       <div className="flex flex-wrap justify-center gap-4">
-        {nodes.map((node, index) => (
+        {roadmap.nodes.map((node, index) => (
           <div 
             key={index}
             className="flex flex-col items-center"
@@ -28,7 +31,7 @@ export default function RoadmapTree({ nodes, roadmapId }: RoadmapTreeProps) {
               {node.title}
             </Link>
             
-            {index < nodes.length - 1 && (
+            {index < roadmap.nodes.length - 1 && (
               <div className="h-8 w-px bg-gray-600 my-2"></div>
             )}
           </div>

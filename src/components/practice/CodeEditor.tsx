@@ -1,45 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Editor } from '@monaco-editor/react';
+import React, { useRef, useEffect } from 'react';
 
 interface CodeEditorProps {
-  initialCode: string;
+  code: string;
+  setCode: (code: string) => void;
   language: string;
-  height?: string;
-  onChange?: (value: string | undefined) => void;
 }
 
-export default function CodeEditor({ 
-  initialCode, 
-  language, 
-  height = "500px",
-  onChange 
-}: CodeEditorProps) {
-  const [code, setCode] = useState(initialCode);
+export default function CodeEditor({ code, setCode, language }: CodeEditorProps) {
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   
-  const handleEditorChange = (value: string | undefined) => {
-    setCode(value || '');
-    if (onChange) {
-      onChange(value);
+  // In a real app, you'd use a library like Monaco Editor or CodeMirror
+  // This is a simple textarea-based editor for demonstration purposes
+  
+  useEffect(() => {
+    // Auto-resize the textarea to fit its content
+    if (editorRef.current) {
+      editorRef.current.style.height = 'auto';
+      editorRef.current.style.height = `${editorRef.current.scrollHeight}px`;
     }
-  };
+  }, [code]);
   
   return (
-    <div className="rounded overflow-hidden border border-gray-700">
-      <Editor
-        height={height}
-        defaultLanguage={language}
-        defaultValue={initialCode}
-        onChange={handleEditorChange}
-        options={{
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          fontSize: 14,
-          lineNumbers: 'on',
-          wordWrap: 'on',
-          theme: 'vs-dark',
-        }}
+    <div className="h-full bg-gray-800 p-4">
+      <div className="flex justify-between items-center mb-2">
+        <select
+          className="bg-gray-700 text-white px-2 py-1 rounded text-sm"
+          value={language}
+          onChange={(e) => console.log('Language changed:', e.target.value)}
+        >
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="java">Java</option>
+          <option value="cpp">C++</option>
+        </select>
+        
+        <div className="text-xs text-gray-400">
+          Auto-save enabled
+        </div>
+      </div>
+      
+      <textarea
+        ref={editorRef}
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        className="w-full h-full min-h-[300px] bg-gray-900 text-gray-200 p-4 font-mono text-sm resize-none focus:outline-none"
+        placeholder="Write your code here..."
+        spellCheck={false}
       />
     </div>
   );
